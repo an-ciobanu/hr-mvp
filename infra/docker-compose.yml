@@ -1,0 +1,58 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: hrmvp_db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-hrmvp}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-hrmvp}
+      POSTGRES_DB: ${POSTGRES_DB:-hrmvp}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ../db/migrations:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-hrmvp} -d ${POSTGRES_DB:-hrmvp}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  adminer:
+    image: adminer:latest
+    container_name: hrmvp_adminer
+    depends_on:
+      db
+    ports:
+      - "8080:8080"
+
+  api:
+    build:
+      context: ../api
+      dockerfile: Dockerfile
+    container_name: hrmvp_api
+    environment:
+      PORT: 3001
+      NODE_ENV: development
+      DATABASE_URL: "postgres://${POSTGRES_USER:-hrmvp}:${POSTGRES_PASSWORD:-hrmvp}@db:5432/${POSTGRES_DB:-hrmvp}"
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-in-prod}
+      HUGGINGFACE_API_KEY: ${HUGGINGFACE_API_KEY:-}
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "3001:3001"
+    volumes:
+      - ../api:/app
+      - /app/node_modules
+    restart: on-failure
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+volumes:
+  db_data:
