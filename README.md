@@ -51,3 +51,18 @@ HUGGINGFACE_API_KEY=
 - Add frontend container to Compose for full-stack orchestration
 - Automate running migrations/seeds inside containers for easier onboarding
 - Add more granular healthchecks and readiness probes for production stability
+
+### 14-10 – Login System, Modular Routing, and Injectable DB Service
+
+**Architecture notes**
+
+- Added `/api/auth/login` endpoint for secure authentication using JWT and HTTP-only cookies
+- Created `lib/db.js` as a singleton injectable service for Postgres access
+- Refactored backend to use modular routers: `routes/auth.js` for login, `routes/status.js` for health and hello endpoints
+- All routes are now mounted in `server.js` for better separation and maintainability
+
+**If we had more time**
+
+- Add logout and session validation endpoints
+- Implement RBAC middleware for protected routes
+- Add integration and unit tests for authentication and error handling

@@ -18,23 +18,12 @@ app.use(
   })
 );
 
-// Health check
-app.get("/health", (c) =>
-  c.json({ ok: true, service: "api", env: process.env.NODE_ENV || "dev" })
-);
+import authRoutes from "./routes/auth.js";
+import statusRoutes from "./routes/status.js";
 
-// DB connection test
-app.get("/api/hello", async (c) => {
-  try {
-    const [{ now }] = await sql`SELECT now()`;
-    return c.json({ message: "Hello", dbTime: now });
-  } catch (e) {
-    console.error("DB connection error:", e);
-    return c.json({ error: "Database connection failed" }, 500);
-  }
-});
+app.route("/api", statusRoutes);
 
-// TODO: Add route imports here
+app.route("/api/auth", authRoutes);
 
 app.onError((err, c) => {
   console.error("Server error:", err);
