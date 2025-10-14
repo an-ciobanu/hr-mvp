@@ -20,7 +20,7 @@ const profileSchema = z.object({
 });
 
 // RBAC helper: returns true if user is self or manager of target
-async function canEditProfile(user, targetUserId) {
+async function isEmployeeOrManager(user, targetUserId) {
   if (!user) return false;
   if (user.id === targetUserId) return true;
   const res =
@@ -48,7 +48,7 @@ router.post("/:userId", async (c) => {
     return c.json({ error: "Unauthorized" }, 401);
   }
 
-  if (!(await canEditProfile(user, userId))) {
+  if (!(await isEmployeeOrManager(user, userId))) {
     return c.json({ error: "Forbidden" }, 403);
   }
 
@@ -106,7 +106,7 @@ router.put("/:userId", async (c) => {
     return c.json({ error: "Unauthorized" }, 401);
   }
 
-  if (!(await canEditProfile(user, userId))) {
+  if (!(await isEmployeeOrManager(user, userId))) {
     return c.json({ error: "Forbidden" }, 403);
   }
 
@@ -138,6 +138,41 @@ router.put("/:userId", async (c) => {
   } catch (err) {
     logger.error("DB error updating profile", err);
     return c.json({ error: "Failed to update profile" }, 500);
+  }
+});
+
+/**
+ * GET /api/profiles/:userId
+ * Employee or their manager can fetch all profile data for a user
+ * coworker only filtered data
+ */
+router.get("/:userId", async (c) => {
+  const userId = c.req.param("userId");
+  const cookie = c.req.header("Cookie") || "";
+  const user = getUserFromCookie(cookie);
+  if (!user) {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
+  try {
+    const profile = await sql`SELECT * FROM profiles WHERE user_id = ${userId}`;
+    if (!profile.length) {
+      return c.json({ error: "Profile not found" }, 404);
+    }
+
+    let filtered = profile[0];
+    if (user.id !== userId) {
+      const res = await sql`SELECT manager_id FROM users WHERE id = ${userId}`;
+      const isManager = res[0] && res[0].manager_id === user.id;
+      if (!isManager) {
+        const { phone, address, emergency_contact, salary_sensitive, ...rest } =
+          filtered;
+        filtered = rest;
+      }
+    }
+    return c.json({ ok: true, profile: filtered });
+  } catch (err) {
+    await logger.error("DB error fetching profile", err);
+    return c.json({ error: "Failed to fetch profile" }, 500);
   }
 });
 

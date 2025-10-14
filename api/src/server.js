@@ -5,11 +5,10 @@ import { logger } from "./lib/logger.js";
 const app = new Hono();
 const port = Number(process.env.PORT);
 
-// Middleware
 app.use(
   "/api/*",
   cors({
-    origin: process.env.WEB_URL || "http://localhost:5173",
+    origin: process.env.WEB_URL,
     credentials: true,
   })
 );
@@ -18,6 +17,7 @@ import authRoutes from "./routes/auth.js";
 import statusRoutes from "./routes/status.js";
 import employeeRoutes from "./routes/employees.js";
 import profileRoutes from "./routes/profiles.js";
+import feedbackRoutes from "./routes/feedback.js";
 
 if (process.env.NODE_ENV == "development") {
   app.route("/api", statusRoutes);
@@ -26,6 +26,7 @@ if (process.env.NODE_ENV == "development") {
 app.route("/api/auth", authRoutes);
 app.route("/api/employees", employeeRoutes);
 app.route("/api/profiles", profileRoutes);
+app.route("/api/feedback", feedbackRoutes);
 
 app.onError((err, c) => {
   logger.error("Server error", err);
