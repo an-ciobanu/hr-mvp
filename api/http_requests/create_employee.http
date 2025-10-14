@@ -1,0 +1,11 @@
+POST http://localhost:3001/api/employees
+Content-Type: application/json
+Cookie: token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImM4YTk0MjlhLTBlMzMtNDU1Mi1hNDg3LTIzZGI0YThhYWE0NSIsInJvbGUiOiJtYW5hZ2VyIiwiZW1haWwiOiJhZG1pbkBocm12cC5jb20iLCJpYXQiOjE3NjA0NDg0NDYsImV4cCI6MTc2MTA1MzI0Nn0.fNhEsOdKQdLceUCc75V1Q9x7EvXK7ua5ZhuUUD-IqyI; HttpOnly; Path=/; SameSite=Strict
+
+{
+  "name": "John Doe",
+  "email": "john.doe@hrmvp.com",
+  "password": "EmployeePass2025",
+  "role": "test",
+  "department": "Engineering"
+}

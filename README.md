@@ -66,3 +66,17 @@ HUGGINGFACE_API_KEY=
 - Add logout and session validation endpoints
 - Implement RBAC middleware for protected routes
 - Add integration and unit tests for authentication and error handling
+
+### 14-10 – Employee Creation Endpoint & Structured Error Logging
+
+**Architecture notes**
+
+- Added `POST /api/employees` endpoint for managers to create new employee accounts (with hashed password, manager_id set automatically)
+- Input validation with Zod, authentication and RBAC enforced via JWT
+- Errors are now logged to `logs/error.log` in structured JSON format, ready for Grafana/Loki or other log aggregators
+
+**If we had more time**
+
+- Add audit logging for all sensitive actions
+- Add log rotation and retention policies
+- Extend employee creation to support bulk import and email notifications

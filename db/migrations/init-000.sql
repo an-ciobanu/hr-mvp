@@ -11,12 +11,12 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 -- Users table with hierarchical manager relationship
 CREATE TABLE users (
-	id SERIAL PRIMARY KEY,
+	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 	name VARCHAR(255) NOT NULL,
 	email VARCHAR(255) UNIQUE NOT NULL,
 	role TEXT CHECK (role IN ('manager', 'employee')) NOT NULL,
 	department VARCHAR(255),
-	manager_id INTEGER REFERENCES users(id),
+	manager_id UUID REFERENCES users(id),
 	password_hash TEXT NOT NULL,
 	created_at TIMESTAMP DEFAULT NOW(),
 	updated_at TIMESTAMP DEFAULT NOW()
@@ -24,7 +24,7 @@ CREATE TABLE users (
 
 -- Profiles table with sensitive salary data
 CREATE TABLE profiles (
-	user_id INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+	user_id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
 	phone VARCHAR(50),
 	address TEXT,
 	emergency_contact JSONB,
@@ -39,9 +39,9 @@ CREATE TABLE profiles (
 
 -- Feedback table for coworker/manager feedback
 CREATE TABLE feedback (
-	id SERIAL PRIMARY KEY,
-	target_user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-	author_user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	target_user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+	author_user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
 	body_raw TEXT NOT NULL,
 	body_polished TEXT,
 	-- nullable; filled if AI polish succeeds
@@ -50,8 +50,8 @@ CREATE TABLE feedback (
 
 -- Absences table for employee requests
 CREATE TABLE absences (
-	id SERIAL PRIMARY KEY,
-	user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
 	start_date DATE NOT NULL,
 	end_date DATE NOT NULL,
 	reason TEXT NOT NULL,
@@ -105,7 +105,7 @@ FROM
 WHERE
 	m.role = 'manager';
 
--- Default admin suer. It will be used to create the initial users (only MVP)
+-- Default admin user. It will be used to create the initial users (only MVP)
 INSERT INTO
 	users (
 		name,

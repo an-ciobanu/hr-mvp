@@ -1,13 +1,9 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import postgres from "postgres";
+import { logError } from "./lib/logger.js";
 
 const app = new Hono();
-const port = Number(process.env.PORT || 3001);
-const databaseUrl =
-  process.env.DATABASE_URL || "postgres://hrmvp:hrmvp@localhost:5432/hrmvp";
-
-const sql = postgres(databaseUrl, { prepare: true });
+const port = Number(process.env.PORT);
 
 // Middleware
 app.use(
@@ -20,13 +16,17 @@ app.use(
 
 import authRoutes from "./routes/auth.js";
 import statusRoutes from "./routes/status.js";
+import employeeRoutes from "./routes/employees.js";
 
-app.route("/api", statusRoutes);
+if (process.env.NODE_ENV == "development") {
+  app.route("/api", statusRoutes);
+}
 
 app.route("/api/auth", authRoutes);
+app.route("/api/employees", employeeRoutes);
 
 app.onError((err, c) => {
-  console.error("Server error:", err);
+  logError("Server error", { error: err });
   return c.json({ error: "Internal server error" }, 500);
 });
 
