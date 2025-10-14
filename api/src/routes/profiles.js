@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { sql } from "../lib/db.js";
 import { getUserFromCookie } from "../lib/jwt.js";
-import { logError } from "../lib/logger.js";
+import { logger } from "../lib/logger.js";
 
 const router = new Hono();
 
@@ -80,7 +80,7 @@ router.post("/:userId", async (c) => {
     `;
     return c.json({ ok: true, profile: inserted[0] });
   } catch (err) {
-    await logError("DB error creating profile", { error: err });
+    logger.error("DB error creating profile", err);
     return c.json({ error: "Failed to create profile" }, 500);
   }
 });
@@ -136,7 +136,7 @@ router.put("/:userId", async (c) => {
 
     return c.json({ ok: true, profile: updated[0] });
   } catch (err) {
-    await logError("DB error updating profile", { error: err });
+    logger.error("DB error updating profile", err);
     return c.json({ error: "Failed to update profile" }, 500);
   }
 });

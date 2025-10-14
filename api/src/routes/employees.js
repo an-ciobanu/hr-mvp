@@ -2,7 +2,7 @@ import { z } from "zod";
 import { Hono } from "hono";
 import bcrypt from "bcryptjs";
 import { sql } from "../lib/db.js";
-import { logError } from "../lib/logger.js";
+import { logger } from "../lib/logger.js";
 import { getUserFromCookie } from "../lib/jwt.js";
 
 const router = new Hono();
@@ -54,10 +54,10 @@ router.post("/", async (c) => {
   } catch (err) {
     if (err.code === "23505") {
       // unique_violation
-      await logError("Email already exists", { error: err });
+      logger.error("Email already exists", err);
       return c.json({ error: "Email already exists" }, 400);
     }
-    await logError("DB error creating employee", { error: err });
+    logger.error("DB error creating employee", err);
     return c.json({ error: "Failed to create employee" }, 500);
   }
 });

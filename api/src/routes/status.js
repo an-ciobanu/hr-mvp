@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { sql } from "../lib/db.js";
-import { logError } from "../lib/logger.js";
+import { logger } from "../lib/logger.js";
 
 const router = new Hono();
 
@@ -14,8 +14,8 @@ router.get("/hello", async (c) => {
   try {
     const [{ now }] = await sql`SELECT now()`;
     return c.json({ message: "Hello", dbTime: now });
-  } catch (e) {
-    await logError("DB connection error", { error: e });
+  } catch (err) {
+    logger.error("DB connection error", err);
     return c.json({ error: "Database connection failed" }, 500);
   }
 });

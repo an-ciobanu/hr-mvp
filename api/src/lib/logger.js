@@ -1,18 +1,21 @@
-import { write } from "bun";
+import { createLogger, format, transports } from "winston";
 
-const LOG_PATH = "logs/error.log";
+// Create Winston logger
+const logger = createLogger({
+  level: "info", // Default log level
+  format: format.combine(
+    format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
+    format.errors({ stack: true }), // Include stack trace for errors
+    format.json()
+  ),
+  transports: [
+    new transports.Console(), // Log to console
+    new transports.File({ filename: "logs/error.log", level: "error" }), // Error logs
+    new transports.File({ filename: "logs/combined.log" }), // All logs
+  ],
+  exceptionHandlers: [
+    new transports.File({ filename: "logs/exceptions.log" }), // Uncaught exceptions
+  ],
+});
 
-/**
- * Writes a structured error log entry to logs/error.log
- * @param {string} message - Short error message
- * @param {object} details - Additional error details (optional)
- */
-export async function logError(message, details = {}) {
-  const entry = {
-    timestamp: new Date().toISOString(),
-    level: "error",
-    message,
-    details,
-  };
-  await write(LOG_PATH, JSON.stringify(entry) + "\n", { append: true });
-}
+export { logger };

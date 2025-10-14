@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import { logError } from "./lib/logger.js";
+import { logger } from "./lib/logger.js";
 
 const app = new Hono();
 const port = Number(process.env.PORT);
@@ -28,7 +28,7 @@ app.route("/api/employees", employeeRoutes);
 app.route("/api/profiles", profileRoutes);
 
 app.onError((err, c) => {
-  logError("Server error", { error: err });
+  logger.error("Server error", err);
   return c.json({ error: "Internal server error" }, 500);
 });
 
