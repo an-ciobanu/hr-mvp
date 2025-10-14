@@ -7,6 +7,8 @@ DROP TABLE IF EXISTS profiles CASCADE;
 
 DROP TABLE IF EXISTS users CASCADE;
 
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
 -- Users table with hierarchical manager relationship
 CREATE TABLE users (
 	id SERIAL PRIMARY KEY,
@@ -15,6 +17,7 @@ CREATE TABLE users (
 	role TEXT CHECK (role IN ('manager', 'employee')) NOT NULL,
 	department VARCHAR(255),
 	manager_id INTEGER REFERENCES users(id),
+	password_hash TEXT NOT NULL,
 	created_at TIMESTAMP DEFAULT NOW(),
 	updated_at TIMESTAMP DEFAULT NOW()
 );
@@ -101,3 +104,23 @@ FROM
 	JOIN users e ON m.id = e.manager_id
 WHERE
 	m.role = 'manager';
+
+-- Default admin suer. It will be used to create the initial users (only MVP)
+INSERT INTO
+	users (
+		name,
+		email,
+		role,
+		department,
+		manager_id,
+		password_hash
+	)
+VALUES
+	(
+		'Admin User',
+		'admin@hrmvp.com',
+		'manager',
+		'Executive',
+		NULL,
+		crypt('AdminHRMVP!2025', gen_salt('bf'))
+	);

@@ -5,16 +5,16 @@ services:
     image: postgres:16-alpine
     container_name: hrmvp_db
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-hrmvp}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-hrmvp}
-      POSTGRES_DB: ${POSTGRES_DB:-hrmvp}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
-      - "${DB_PORT:-5432}:5432"
+      - "${DB_PORT}:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
       - ../db/migrations:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-hrmvp} -d ${POSTGRES_DB:-hrmvp}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 5s
       timeout: 3s
       retries: 20
@@ -35,8 +35,8 @@ services:
     environment:
       PORT: 3001
       NODE_ENV: development
-      DATABASE_URL: "postgres://${POSTGRES_USER:-hrmvp}:${POSTGRES_PASSWORD:-hrmvp}@db:5432/${POSTGRES_DB:-hrmvp}"
-      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-in-prod}
+      DATABASE_URL: "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}"
+      JWT_SECRET: ${JWT_SECRET:-}
       HUGGINGFACE_API_KEY: ${HUGGINGFACE_API_KEY:-}
     depends_on:
       db:

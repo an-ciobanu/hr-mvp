@@ -1,5 +1,20 @@
 ## Run the project
 
+**Environment variables:**  
+Set these in your `.env` (at repo root):
+
+```
+POSTGRES_USER=
+POSTGRES_PASSWORD=
+POSTGRES_DB=
+DB_PORT=
+DATABASE_URL=
+PORT=
+JWT_SECRET=
+WEB_URL=
+HUGGINGFACE_API_KEY=
+```
+
 - `podman-compose -f infra/docker-compose.yml up` (or use Docker if preferred)
 - Access Adminer at [http://localhost:8080](http://localhost:8080) (used for development purposes)
 
@@ -13,6 +28,7 @@
 - Coworker role is now computed (same manager_id) rather than stored - cleaner RBAC logic
 - Created helper views (`coworkers`, `direct_reports`) to simplify common RBAC queries
 - JSONB fields for flexible emergency contacts and salary data structure
+- Added admin user that will be able to add employees into the database
 
 **If we had more time**
 
