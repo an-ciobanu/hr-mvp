@@ -1,6 +1,18 @@
 import jwt from "jsonwebtoken";
 
 /**
+ * Extracts and verifies JWT from Cookie header string.
+ * @param {string} cookieHeader - The Cookie header value
+ * @returns {object|null} Decoded user or null if invalid
+ */
+export function getUserFromCookie(cookieHeader) {
+  if (!cookieHeader) return null;
+  const tokenMatch = cookieHeader.match(/token=([^;]+)/);
+  const token = tokenMatch ? tokenMatch[1] : null;
+  return token ? verifyJwt(token) : null;
+}
+
+/**
  * Signs a JWT for the authenticated user.
  * @param {object} payload - User info to encode in the token.
  * @returns {string} JWT string.

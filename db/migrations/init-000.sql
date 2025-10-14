@@ -30,7 +30,7 @@ CREATE TABLE profiles (
 	emergency_contact JSONB,
 	-- { name, phone, relationship }
 	salary_sensitive JSONB,
-	-- { amount, currency, bonus_eligible }
+	-- { amount, currency }
 	bio TEXT,
 	start_date DATE,
 	created_at TIMESTAMP DEFAULT NOW(),

@@ -1,0 +1,19 @@
+POST http://localhost:3001/api/profiles
+Content-Type: application/json
+Cookie: token=YOUR_JWT_TOKEN_HERE
+
+{
+  "phone": "+40123456789",
+  "address": "123 Main St, City",
+  "emergency_contact": {
+    "name": "Jane Doe",
+    "phone": "+40123456780",
+    "relationship": "Spouse"
+  },
+  "bio": "Software engineer at HRMVP.",
+  "start_date": "2025-10-14",
+  "salary_sensitive": {
+    "amount": 50000,
+    "currency": "EUR"
+  }
+}

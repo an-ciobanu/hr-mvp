@@ -18,6 +18,46 @@ HUGGINGFACE_API_KEY=
 - `podman-compose -f infra/docker-compose.yml up` (or use Docker if preferred)
 - Access Adminer at [http://localhost:8080](http://localhost:8080) (used for development purposes)
 
+## Tech stack - Why did I choose what I chose?
+
+### Database: Postgres
+
+**Advantages**
+
+- Since I envisioned a database schema that has relations between entities I automatically looked for a SQL database
+- I have a few years of experience in Postgres
+- Postgres itself offers many extensions that can be used out of the box. [You can actually make a fullstack app using only Postgres](https://www.youtube.com/watch?v=3JW732GrMdg)
+
+**Disadvantages**
+
+- The more changes in an SQL database schema are done, the slower the project. Once you start modifying the lower levels of any fullstack app, you might need to revisit logic in an upper part of it. If the schema is not thought through in the beginning, any modification can add delays/bugs
+
+**Conclusion**
+
+Any SQL database would have been ok for this project. Postgres just helps me out to speed things along.
+
+### Backend: Bun
+
+**Avantages**
+
+- JavaScript is a good language for MVPs
+- Simple, fast for development since is untyped
+- I also have some years of experience with it
+- AI friendly: many projects that were used to train LLMs where JavaScript oriented, so most of them are biased towards JavaScript
+- Good support online: many knowledge pools regarding JS are online. Also, there are many modules that can be used to haste development so that we are not reinventing the wheel
+- Why Bun and not NodeJS? Bun has an integrated package manager compatible with npm. Runtime developed in Zig, created to be faster than NodeJS and use less resources. Out of the box support for typescript, too, in case an MVP needs to be taken a step further and be more production like.
+
+**Disadvantages**
+
+- Since JavaScript is untyped, in a larger application bugs can be introduced due to not handling well the objects we create
+- Slow at runtime
+- Uses too many resources compared to other languages (Go comes to mind)
+- If a project is too dependent on external modules, maintaining it and keeping it secure is a hastle
+
+**Conclusion**
+
+Since I have limited time to develop as much of a product I can to highlight all my knowledge, fast development and familiarity are far more important
+
 ## Change Log (human-friendly)
 
 ### 14-10 – Database Schema & Hierarchical RBAC Setup
@@ -80,3 +120,18 @@ HUGGINGFACE_API_KEY=
 - Add audit logging for all sensitive actions
 - Add log rotation and retention policies
 - Extend employee creation to support bulk import and email notifications
+
+### 14-10 – Profile Creation & Editing Endpoints
+
+**Architecture notes**
+
+- Added `POST /api/profiles` endpoint for employees and their managers to create a profile
+- Added `PUT /api/profiles/:userId` endpoint for employees and their managers to edit a profile
+- RBAC logic ensures only the employee or their manager can create/edit, and only managers can set `salary_sensitive` fields
+- Input validation with Zod, authentication via JWT, and error logging integrated
+
+**If we had more time**
+
+- Add audit trail for profile changes
+- Add field-level permissions for more granular control
+- Add profile history/versioning for rollback and review

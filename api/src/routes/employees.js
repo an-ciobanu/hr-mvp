@@ -2,8 +2,8 @@ import { z } from "zod";
 import { Hono } from "hono";
 import bcrypt from "bcryptjs";
 import { sql } from "../lib/db.js";
-import { verifyJwt } from "../lib/jwt.js";
 import { logError } from "../lib/logger.js";
+import { getUserFromCookie } from "../lib/jwt.js";
 
 const router = new Hono();
 
@@ -26,10 +26,7 @@ router.post("/", async (c) => {
     return c.json({ error: "Invalid input" }, 400);
   }
 
-  const cookie = c.req.header("Cookie") || "";
-  const tokenMatch = cookie.match(/token=([^;]+)/);
-  const token = tokenMatch ? tokenMatch[1] : null;
-  const user = token ? verifyJwt(token) : null;
+  const user = getUserFromCookie(cookie);
   if (!user) {
     return c.json({ error: "Unauthorized" }, 401);
   }

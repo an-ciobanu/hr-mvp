@@ -1,0 +1,8 @@
+PUT http://localhost:3001/api/profiles/USER_ID_HERE
+Content-Type: application/json
+Cookie: token=YOUR_JWT_TOKEN_HERE
+
+{
+  "phone": "+40123456799",
+  "bio": "Updated bio for HRMVP employee."
+}
