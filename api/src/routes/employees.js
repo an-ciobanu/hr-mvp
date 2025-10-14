@@ -26,6 +26,7 @@ router.post("/", async (c) => {
     return c.json({ error: "Invalid input" }, 400);
   }
 
+  const cookie = c.req.header("Cookie") || "";
   const user = getUserFromCookie(cookie);
   if (!user) {
     return c.json({ error: "Unauthorized" }, 401);

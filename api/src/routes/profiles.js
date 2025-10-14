@@ -29,10 +29,11 @@ async function canEditProfile(user, targetUserId) {
 }
 
 /**
- * POST /api/profiles
- * Manager/employee creates a profile
+ * POST /api/profiles/:userId
+ * Manager/employee creates a profile for a specific user
  */
-router.post("/", async (c) => {
+router.post("/:userId", async (c) => {
+  const userId = c.req.param("userId");
   const body = await c.req.json();
   const result = profileSchema.safeParse(body);
   if (!result.success) {
@@ -43,19 +44,31 @@ router.post("/", async (c) => {
   }
   const cookie = c.req.header("Cookie") || "";
   const user = getUserFromCookie(cookie);
-  if (!user) return c.json({ error: "Unauthorized" }, 401);
+  if (!user) {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
 
-  if (!(await canEditProfile(user, user.id)))
+  if (!(await canEditProfile(user, userId))) {
     return c.json({ error: "Forbidden" }, 403);
+  }
+
   try {
-    const exists = await sql`SELECT 1 FROM profiles WHERE user_id = ${user.id}`;
-    if (exists.length) return c.json({ error: "Profile already exists" }, 400);
+    const exists = await sql`SELECT 1 FROM profiles WHERE user_id = ${userId}`;
+    if (exists.length) {
+      return c.json({ error: "Profile already exists" }, 400);
+    }
+
     const profileData = { ...result.data };
-    if (user.role !== "manager") delete profileData.salary_sensitive;
+
+    // Only managers can set salary_sensitive
+    if (user.role !== "manager") {
+      delete profileData.salary_sensitive;
+    }
+
     const inserted = await sql`
       INSERT INTO profiles (user_id, phone, address, emergency_contact, salary_sensitive, bio, start_date)
       VALUES (
-        ${user.id},
+        ${userId},
         ${profileData.phone},
         ${profileData.address},
         ${profileData.emergency_contact},
@@ -99,15 +112,15 @@ router.put("/:userId", async (c) => {
 
   try {
     const profileData = { ...result.data };
-
-    if (user.role !== "manager") delete profileData.salary_sensitive;
-
+    if (user.role !== "manager") {
+      delete profileData.salary_sensitive;
+    }
     const updated = await sql`
       UPDATE profiles SET
-        phone = COALESCE(${profileData.phone}, phone),
-        address = COALESCE(${profileData.address}, address),
+        phone = COALESCE(${profileData.phone || null}, phone),
+        address = COALESCE(${profileData.address || null}, address),
         emergency_contact = COALESCE(${
-          profileData.emergency_contact
+          profileData.emergency_contact || null
         }, emergency_contact),
         salary_sensitive = COALESCE(${
           profileData.salary_sensitive || null

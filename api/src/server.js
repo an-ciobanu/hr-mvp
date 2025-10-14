@@ -17,6 +17,7 @@ app.use(
 import authRoutes from "./routes/auth.js";
 import statusRoutes from "./routes/status.js";
 import employeeRoutes from "./routes/employees.js";
+import profileRoutes from "./routes/profiles.js";
 
 if (process.env.NODE_ENV == "development") {
   app.route("/api", statusRoutes);
@@ -24,6 +25,7 @@ if (process.env.NODE_ENV == "development") {
 
 app.route("/api/auth", authRoutes);
 app.route("/api/employees", employeeRoutes);
+app.route("/api/profiles", profileRoutes);
 
 app.onError((err, c) => {
   logError("Server error", { error: err });
