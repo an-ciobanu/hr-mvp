@@ -125,3 +125,20 @@ HUGGINGFACE_API_KEY=
 - Add audit trail for profile changes
 - Add field-level permissions for more granular control
 - Add profile history/versioning for rollback and review
+
+### 17-10 – Absence Management, RBAC, and Demo Data
+
+**Architecture notes**
+
+- Added `POST /api/absences` endpoint for employees to request absences (pending by default)
+- Added `PATCH /api/absences/:id` endpoint for managers to approve/deny absences (only direct manager allowed)
+- Added `GET /api/absences/:userId` endpoint for employees and their manager to view all absences for a user
+- RBAC enforced using custom `ensureRole` middleware and `isEmployeeOrManager` utility
+- All error cases now logged using Winston logger for easier debugging
+- Seeded demo absences in migration: employee 3 (pending, denied), employee 1 (approved)
+
+**If we had more time**
+
+- Add absence notifications and approval workflow UI
+- Add absence history and audit trail
+- Add bulk absence import and reporting features
