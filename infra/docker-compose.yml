@@ -11,7 +11,6 @@ services:
     ports:
       - "${DB_PORT}:5432"
     volumes:
-      - db_data:/var/lib/postgresql/data
       - ../db/migrations:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
@@ -34,7 +33,7 @@ services:
       dockerfile: Dockerfile
     container_name: hrmvp_api
     environment:
-      PORT: ${PORT}
+      PORT: ${API_PORT}
       NODE_ENV: development
       DATABASE_URL: "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}"
       JWT_SECRET: ${JWT_SECRET:-}
@@ -43,17 +42,31 @@ services:
       db:
         condition: service_healthy
     ports:
-      - "${PORT}:3001"
+      - "${API_PORT}:3001"
     volumes:
       - ../api:/app
       - /app/node_modules
     restart: on-failure
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:${PORT}/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:${API_PORT}/health"]
       interval: 10s
       timeout: 5s
       retries: 10
       start_period: 20s
+  
+  web:
+    image: node:20-alpine
+    container_name: hrmvp_web
+    working_dir: /app
+    volumes:
+      - ../web:/app
+    command: sh -c "npm install && npm run dev -- --host"
+    ports:
+      - "5173:5173"
+    depends_on:
+      - api
+    environment:
+      - VITE_API_URL=http://localhost:${WEB_PORT}
 
 volumes:
   db_data:
