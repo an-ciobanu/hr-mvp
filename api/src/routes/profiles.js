@@ -1,8 +1,9 @@
 import { Hono } from "hono";
 import { z } from "zod";
 import { sql } from "../lib/db.js";
-import { getUserFromCookie } from "../lib/jwt.js";
 import { logger } from "../lib/logger.js";
+import { getUserFromCookie } from "../lib/jwt.js";
+import { isEmployeeOrManager } from "../lib/utils.js";
 
 const router = new Hono();
 
@@ -18,15 +19,6 @@ const profileSchema = z.object({
   start_date: z.string().optional(),
   salary_sensitive: z.any().optional(),
 });
-
-// RBAC helper: returns true if user is self or manager of target
-async function isEmployeeOrManager(user, targetUserId) {
-  if (!user) return false;
-  if (user.id === targetUserId) return true;
-  const res =
-    await sql`SELECT manager_id FROM users WHERE id = ${targetUserId}`;
-  return res[0] && res[0].manager_id === user.id;
-}
 
 /**
  * POST /api/profiles/:userId

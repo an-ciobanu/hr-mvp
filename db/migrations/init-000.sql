@@ -105,7 +105,7 @@ FROM
 WHERE
 	m.role = 'manager';
 
--- Default admin user. It will be used to create the initial users (only MVP)
+-- Data used for demo purpses
 INSERT INTO
 	users (
 		name,
@@ -116,6 +116,7 @@ INSERT INTO
 		password_hash
 	)
 VALUES
+	-- Admin user
 	(
 		'Admin User',
 		'admin@hrmvp.com',
@@ -123,4 +124,304 @@ VALUES
 		'Executive',
 		NULL,
 		crypt('AdminHRMVP!2025', gen_salt('bf'))
+	),
+	-- Manager 1 (reports to admin)
+	(
+		'Manager One',
+		'manager1@hrmvp.com',
+		'manager',
+		'Sales',
+		(
+			SELECT
+				id
+			FROM
+				users
+			WHERE
+				email = 'admin@hrmvp.com'
+		),
+		crypt('Manager1!2025', gen_salt('bf'))
+	),
+	-- Manager 2 (reports to admin)
+	(
+		'Manager Two',
+		'manager2@hrmvp.com',
+		'manager',
+		'Engineering',
+		(
+			SELECT
+				id
+			FROM
+				users
+			WHERE
+				email = 'admin@hrmvp.com'
+		),
+		crypt('Manager2!2025', gen_salt('bf'))
+	),
+	-- Employee 1 (reports to Manager 1)
+	(
+		'Employee One',
+		'employee1@hrmvp.com',
+		'employee',
+		'Sales',
+		(
+			SELECT
+				id
+			FROM
+				users
+			WHERE
+				email = 'manager1@hrmvp.com'
+		),
+		crypt('Employee1!2025', gen_salt('bf'))
+	),
+	-- Employee 2 (reports to Manager 2)
+	(
+		'Employee Two',
+		'employee2@hrmvp.com',
+		'employee',
+		'Engineering',
+		(
+			SELECT
+				id
+			FROM
+				users
+			WHERE
+				email = 'manager2@hrmvp.com'
+		),
+		crypt('Employee2!2025', gen_salt('bf'))
+	),
+	-- Employee 3 (reports to Manager 2)
+	(
+		'Employee Three',
+		'employee3@hrmvp.com',
+		'employee',
+		'Engineering',
+		(
+			SELECT
+				id
+			FROM
+				users
+			WHERE
+				email = 'manager2@hrmvp.com'
+		),
+		crypt('Employee3!2025', gen_salt('bf'))
+	);
+
+INSERT INTO
+	feedback (
+		target_user_id,
+		author_user_id,
+		body_raw,
+		body_polished
+	)
+VALUES
+	-- Employee 2 to Employee 1
+	(
+		(
+			SELECT
+				id
+			FROM
+				users
+			WHERE
+				email = 'employee1@hrmvp.com'
+		),
+		(
+			SELECT
+				id
+			FROM
+				users
+			WHERE
+				email = 'employee2@hrmvp.com'
+		),
+		'Great teamwork on the sales project!',
+		NULL
+	),
+	-- Employee 3 to Employee 2
+	(
+		(
+			SELECT
+				id
+			FROM
+				users
+			WHERE
+				email = 'employee2@hrmvp.com'
+		),
+		(
+			SELECT
+				id
+			FROM
+				users
+			WHERE
+				email = 'employee3@hrmvp.com'
+		),
+		'Thanks for helping with the onboarding process.',
+		NULL
+	),
+	-- Manager 1 to Employee 1
+	(
+		(
+			SELECT
+				id
+			FROM
+				users
+			WHERE
+				email = 'employee1@hrmvp.com'
+		),
+		(
+			SELECT
+				id
+			FROM
+				users
+			WHERE
+				email = 'manager1@hrmvp.com'
+		),
+		'Excellent performance this quarter.',
+		NULL
+	);
+
+-- Demo profiles for all users except admin
+INSERT INTO
+	profiles (
+		user_id,
+		phone,
+		address,
+		emergency_contact,
+		salary_sensitive,
+		bio,
+		start_date
+	)
+VALUES
+	-- Manager 1
+	(
+		(
+			SELECT
+				id
+			FROM
+				users
+			WHERE
+				email = 'manager1@hrmvp.com'
+		),
+		'0712345678',
+		'123 Sales St, City',
+		'{"name": "Jane Doe", "phone": "0700000001", "relationship": "Spouse"}',
+		'{"amount": 80000, "currency": "EUR"}',
+		'Sales manager with 10 years experience.',
+		'2022-01-10'
+	),
+	-- Manager 2
+	(
+		(
+			SELECT
+				id
+			FROM
+				users
+			WHERE
+				email = 'manager2@hrmvp.com'
+		),
+		'0723456789',
+		'456 Eng Ave, City',
+		'{"name": "John Smith", "phone": "0700000002", "relationship": "Partner"}',
+		'{"amount": 85000, "currency": "EUR"}',
+		'Engineering manager, passionate about tech.',
+		'2022-02-15'
+	),
+	-- Employee 1
+	(
+		(
+			SELECT
+				id
+			FROM
+				users
+			WHERE
+				email = 'employee1@hrmvp.com'
+		),
+		'0734567890',
+		'789 Sales St, City',
+		'{"name": "Emily Roe", "phone": "0700000003", "relationship": "Parent"}',
+		'{"amount": 40000, "currency": "EUR"}',
+		'Sales associate, team player.',
+		'2023-03-01'
+	),
+	-- Employee 2
+	(
+		(
+			SELECT
+				id
+			FROM
+				users
+			WHERE
+				email = 'employee2@hrmvp.com'
+		),
+		'0745678901',
+		'101 Eng Ave, City',
+		'{"name": "Mark Poe", "phone": "0700000004", "relationship": "Sibling"}',
+		'{"amount": 42000, "currency": "EUR"}',
+		'Junior engineer, quick learner.',
+		'2023-04-10'
+	),
+	-- Employee 3
+	(
+		(
+			SELECT
+				id
+			FROM
+				users
+			WHERE
+				email = 'employee3@hrmvp.com'
+		),
+		'0756789012',
+		'202 Eng Ave, City',
+		'{"name": "Anna Lee", "phone": "0700000005", "relationship": "Friend"}',
+		'{"amount": 43000, "currency": "EUR"}',
+		'Engineer, focused on backend systems.',
+		'2023-05-20'
+	);
+
+-- Demo absences
+INSERT INTO
+	absences (user_id, start_date, end_date, reason, status)
+VALUES
+	-- Employee 3: rejected absence
+	(
+		(
+			SELECT
+				id
+			FROM
+				users
+			WHERE
+				email = 'employee3@hrmvp.com'
+		),
+		'2025-10-01',
+		'2025-10-05',
+		'Vacation request',
+		'rejected'
+	),
+	-- Employee 3: pending absence
+	(
+		(
+			SELECT
+				id
+			FROM
+				users
+			WHERE
+				email = 'employee3@hrmvp.com'
+		),
+		'2025-11-10',
+		'2025-11-12',
+		'Medical appointment',
+		'requested'
+	),
+	-- Employee 1: accepted absence
+	(
+		(
+			SELECT
+				id
+			FROM
+				users
+			WHERE
+				email = 'employee1@hrmvp.com'
+		),
+		'2025-09-15',
+		'2025-09-16',
+		'Family event',
+		'approved'
 	);

@@ -1,0 +1,3 @@
+### Get Absences for Employee
+GET http://localhost:3000/api/absences/YOUR_USER_ID
+Cookie: token=YOUR_JWT_TOKEN
