@@ -9,16 +9,26 @@ import AbsenceRequestPage from "./pages/AbsenceRequestPage";
 import ManagerPanelPage from "./pages/ManagerPanelPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import ProtectedRoute from "./components/Common/ProtectedRoute";
-import { isLoggedIn } from "./lib/auth";
+import { useAuth } from "./components/Auth/AuthContext";
 
 export default function AppRoutes() {
+  const { data, isLoading } = useAuth();
   return (
     <Routes>
-      <Route path="/login" element={<LoginPage />} />
+      <Route
+        path="/login"
+        element={
+          isLoading ? null : data && data.ok ? (
+            <Navigate to="/profile" replace />
+          ) : (
+            <LoginPage />
+          )
+        }
+      />
       <Route
         path="/"
         element={
-          isLoggedIn() ? (
+          isLoading ? null : data && data.ok ? (
             <Navigate to="/profile" replace />
           ) : (
             <Navigate to="/login" replace />

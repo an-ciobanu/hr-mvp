@@ -19,7 +19,7 @@ const router = new Hono();
  * POST /api/absences
  * Employee creates an absence request for self
  */
-router.post("/api/absences", ensureRole("employee"), async (c) => {
+router.post("/", async (c) => {
   const cookie = c.req.header("Cookie") || "";
   const user = getUserFromCookie(cookie);
   const body = await c.req.json();
@@ -31,7 +31,7 @@ router.post("/api/absences", ensureRole("employee"), async (c) => {
     const { start_date, end_date, reason } = result.data;
     const inserted = await sql`
       INSERT INTO absences (user_id, start_date, end_date, reason, status)
-      VALUES (${user.id}, ${start_date}, ${end_date}, ${reason}, 'pending')
+      VALUES (${user.id}, ${start_date}, ${end_date}, ${reason}, 'requested')
       RETURNING *
     `;
     return c.json({ absence: inserted[0] });
@@ -49,7 +49,7 @@ router.post("/api/absences", ensureRole("employee"), async (c) => {
  * Only the employee or their manager can view
  */
 
-router.get("/api/absences/:userId", async (c) => {
+router.get("/:userId", async (c) => {
   const userId = c.req.param("userId");
   const cookie = c.req.header("Cookie") || "";
   const user = getUserFromCookie(cookie);
@@ -77,7 +77,7 @@ router.get("/api/absences/:userId", async (c) => {
  * Manager approves or denies an absence request for their direct report
  * Body: { status: 'approved' | 'rejected' }
  */
-router.patch("/api/absences/:id", ensureRole("manager"), async (c) => {
+router.patch("/:id", ensureRole("manager"), async (c) => {
   const cookie = c.req.header("Cookie") || "";
   const user = getUserFromCookie(cookie);
   const absenceId = c.req.param("id");

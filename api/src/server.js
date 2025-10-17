@@ -18,6 +18,7 @@ import statusRoutes from "./routes/status.js";
 import employeeRoutes from "./routes/employees.js";
 import profileRoutes from "./routes/profiles.js";
 import feedbackRoutes from "./routes/feedback.js";
+import absenceRoutes from "./routes/absences.js";
 
 if (process.env.NODE_ENV == "development") {
   app.route("/api", statusRoutes);
@@ -27,6 +28,7 @@ app.route("/api/auth", authRoutes);
 app.route("/api/employees", employeeRoutes);
 app.route("/api/profiles", profileRoutes);
 app.route("/api/feedback", feedbackRoutes);
+app.route("/api/absences", absenceRoutes);
 
 app.onError((err, c) => {
   logger.error("Server error", err);

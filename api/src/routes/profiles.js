@@ -21,6 +21,29 @@ const profileSchema = z.object({
 });
 
 /**
+ * GET /api/profiles/me
+ * Returns the profile of the currently authenticated user
+ */
+router.get("/me", async (c) => {
+  const cookie = c.req.header("Cookie") || "";
+  const user = getUserFromCookie(cookie);
+  if (!user) {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
+  try {
+    const profile =
+      await sql`SELECT * FROM profiles WHERE user_id = ${user.id}`;
+    if (!profile.length) {
+      return c.json({ error: "Profile not found" }, 404);
+    }
+    return c.json({ ok: true, profile: profile[0], user });
+  } catch (err) {
+    logger.error("DB error fetching own profile", err);
+    return c.json({ error: "Failed to fetch profile" }, 500);
+  }
+});
+
+/**
  * POST /api/profiles/:userId
  * Manager/employee creates a profile for a specific user
  */

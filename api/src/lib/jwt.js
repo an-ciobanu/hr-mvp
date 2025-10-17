@@ -6,7 +6,7 @@ import jwt from "jsonwebtoken";
  * @returns {object|null} Decoded user or null if invalid
  */
 export function getUserFromCookie(cookieHeader) {
-  if (!cookieHeader) return null;
+  if (!cookieHeader || typeof cookieHeader !== "string") return null;
   const tokenMatch = cookieHeader.match(/token=([^;]+)/);
   const token = tokenMatch ? tokenMatch[1] : null;
   return token ? verifyJwt(token) : null;

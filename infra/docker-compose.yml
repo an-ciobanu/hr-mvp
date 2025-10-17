@@ -33,6 +33,7 @@ services:
       dockerfile: Dockerfile
     container_name: hrmvp_api
     environment:
+      WEB_URL: ${WEB_URL}
       PORT: ${API_PORT}
       NODE_ENV: development
       DATABASE_URL: "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}"
@@ -60,13 +61,12 @@ services:
     working_dir: /app
     volumes:
       - ../web:/app
+      - ../web/.env:/app/.env:ro
     command: sh -c "npm install && npm run dev -- --host"
     ports:
       - "5173:5173"
     depends_on:
       - api
-    environment:
-      - VITE_API_URL=http://localhost:${WEB_PORT}
 
 volumes:
   db_data:
