@@ -142,3 +142,20 @@ HUGGINGFACE_API_KEY=
 - Add absence notifications and approval workflow UI
 - Add absence history and audit trail
 - Add bulk absence import and reporting features
+
+### 17-10 – Frontend Skeleton Application
+
+**Architecture notes**
+
+- Scaffolded Vite + React frontend in `web/` with modular folder/component structure
+- Centralized routing with protected routes (all except `/login`, `/`, and `*` require authentication)
+- Implemented `App.jsx`, `App.css` with a modern, unified theme and layout
+- Created `routes.jsx` for maintainable navigation logic
+- Added `Navbar` with company name and consistent styling
+- Set up basic auth check in `lib/auth.js` for route protection
+
+**If we had more time**
+
+- Add user context and real authentication state management
+- Build out UI and API integration for each page/component
+- Add responsive/mobile styles and accessibility improvements
