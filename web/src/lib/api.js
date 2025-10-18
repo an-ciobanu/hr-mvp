@@ -1,4 +1,19 @@
 /**
+ * GET /api/absences/manager
+ * Returns all pending absences for direct reports of the logged-in manager
+ * @returns {Promise<object[]>}
+ */
+export async function getManagerAbsences() {
+  const baseUrl = import.meta.env.VITE_API_URL || "";
+  const res = await fetch(`${baseUrl}/api/absences/manager`, {
+    credentials: "include",
+  });
+  const data = await res.json();
+  if (!res.ok)
+    throw new Error(data.error || "Failed to fetch manager absences");
+  return data.absences;
+}
+/**
  * GET /api/profiles/:userId
  * @param {string} userId
  * @returns {Promise<{ ok: boolean, profile?: object, error?: string }>}

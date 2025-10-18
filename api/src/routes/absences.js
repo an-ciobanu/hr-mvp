@@ -44,11 +44,42 @@ router.post("/", async (c) => {
   }
 });
 /**
+ * GET /api/absences/manager
+ * Returns all pending absences (status = 'requested') for direct reports of the logged-in manager
+ * Only the manager can view their direct reports' pending absences
+ */
+router.get("/manager", async (c) => {
+  const cookie = c.req.header("Cookie") || "";
+  const user = getUserFromCookie(cookie);
+  if (!user) {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
+  if (user.role !== "manager") {
+    return c.json({ error: "Forbidden" }, 403);
+  }
+  try {
+    const absences = await sql`
+      SELECT a.*, u.name as user_name, u.email as user_email
+      FROM absences a
+      JOIN users u ON a.user_id = u.id
+      WHERE u.manager_id = ${user.id} AND a.status = 'requested'
+      ORDER BY a.start_date DESC
+    `;
+    return c.json({ absences });
+  } catch (err) {
+    logger.error("Failed to fetch manager absences", err);
+    return c.json(
+      { error: "Failed to fetch absences", details: err.message },
+      500
+    );
+  }
+});
+
+/**
  * GET /api/absences/:userId
  * Returns all absences for a given employee (any status)
  * Only the employee or their manager can view
  */
-
 router.get("/:userId", async (c) => {
   const userId = c.req.param("userId");
   const cookie = c.req.header("Cookie") || "";
@@ -107,6 +138,39 @@ router.patch("/:id", ensureRole("manager"), async (c) => {
     logger.error("Failed to update absence", err);
     return c.json(
       { error: "Failed to update absence", details: err.message },
+      500
+    );
+  }
+});
+
+/**
+ * GET /api/absences/manager
+ * Returns all pending absences (status = 'requested') for direct reports of the logged-in manager
+ * Only the manager can view their direct reports' pending absences
+ */
+router.get("/manager", async (c) => {
+  console.log(c.req.header("Cookie"));
+  const cookie = c.req.header("Cookie") || "";
+  const user = getUserFromCookie(cookie);
+  if (!user) {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
+  if (user.role !== "manager") {
+    return c.json({ error: "Forbidden" }, 403);
+  }
+  try {
+    const absences = await sql`
+      SELECT a.*, u.name as user_name, u.email as user_email
+      FROM absences a
+      JOIN users u ON a.user_id = u.id
+      WHERE u.manager_id = ${user.id} AND a.status = 'requested'
+      ORDER BY a.start_date DESC
+    `;
+    return c.json({ absences });
+  } catch (err) {
+    logger.error("Failed to fetch manager absences", err);
+    return c.json(
+      { error: "Failed to fetch absences", details: err.message },
       500
     );
   }

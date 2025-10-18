@@ -1,3 +1,4 @@
+import ManagerAbsenceListPage from "./pages/ManagerAbsenceListPage";
 import { Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import ProfileViewPage from "./pages/ProfileViewPage";
@@ -114,6 +115,14 @@ export default function AppRoutes() {
         element={
           <ProtectedRoute>
             <ManagerPanelPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/manager/absences"
+        element={
+          <ProtectedRoute>
+            <ManagerAbsenceListPage />
           </ProtectedRoute>
         }
       />

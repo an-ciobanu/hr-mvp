@@ -8,7 +8,8 @@ import { sql } from "./db.js";
 function ensureRole(role) {
   return async (c, next) => {
     const { getUserFromCookie } = await import("../lib/jwt.js");
-    const user = getUserFromCookie(c);
+    const cookie = c.req.header("Cookie") || "";
+    const user = getUserFromCookie(cookie);
     if (!user || user.role !== role) {
       return c.json({ error: "Forbidden" }, 403);
     }

@@ -5,8 +5,6 @@ import { logout } from "../../lib/auth";
 export default function Navbar() {
   const { data } = useAuth();
   const loggedIn = data && data.ok;
-  const isManager = loggedIn && data.user?.role === "manager";
-
   async function handleLogout() {
     await logout();
     window.location.reload();
@@ -45,15 +43,6 @@ export default function Navbar() {
           >
             Employees
           </Link>
-          {isManager && (
-            <Link
-              to="/manager"
-              className="btn"
-              style={{ background: "#fff", color: "#2563eb" }}
-            >
-              Manager Panel
-            </Link>
-          )}
           <button
             className="btn"
             style={{ background: "#2563eb", color: "#fff" }}
