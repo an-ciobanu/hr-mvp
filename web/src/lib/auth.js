@@ -4,6 +4,16 @@
  * @returns {Promise<{ success: boolean, error?: string }>}
  */
 export async function logout() {
-  localStorage.removeItem("token");
-  return { success: true };
+  try {
+    const res = await fetch("/api/auth/logout", {
+      method: "POST",
+      credentials: "include",
+    });
+    if (!res.ok) {
+      return { success: false, error: "Logout failed" };
+    }
+    return { success: true };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
 }

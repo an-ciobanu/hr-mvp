@@ -15,10 +15,10 @@ app.use(
 
 import authRoutes from "./routes/auth.js";
 import statusRoutes from "./routes/status.js";
-import employeeRoutes from "./routes/employees.js";
-import profileRoutes from "./routes/profiles.js";
-import feedbackRoutes from "./routes/feedback.js";
-import absenceRoutes from "./routes/absences.js";
+import employeeRoutes from "./routes/employees/index.js";
+import profileRoutes from "./routes/profiles/index.js";
+import feedbackRoutes from "./routes/feedback/index.js";
+import absenceRoutes from "./routes/absences/index.js";
 
 if (process.env.NODE_ENV == "development") {
   app.route("/api", statusRoutes);

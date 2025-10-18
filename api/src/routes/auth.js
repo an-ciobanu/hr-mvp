@@ -55,4 +55,18 @@ router.post("/login", async (c) => {
   });
 });
 
+/**
+ * POST /api/auth/logout
+ * Clears the session cookie.
+ */
+router.post("/logout", (c) => {
+  c.header(
+    "Set-Cookie",
+    `token=; HttpOnly; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Strict${
+      process.env.NODE_ENV === "production" ? "; Secure" : ""
+    }`
+  );
+  return c.json({ ok: true });
+});
+
 export default router;
