@@ -1,7 +1,10 @@
 import { useState } from "react";
-import { enhanceFeedbackWithAI } from "../../lib/ai";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { getAllUsers, postFeedback } from "../../lib/api";
+import {
+  getAllUsers,
+  postFeedback,
+  enhanceFeedbackWithAI,
+} from "../../lib/api";
 import { useNavigate } from "react-router-dom";
 
 export default function FeedbackNew() {

@@ -4,18 +4,27 @@
 Set these in your `.env` (at repo root):
 
 ```
+# Database
 POSTGRES_USER=
 POSTGRES_PASSWORD=
 POSTGRES_DB=
 DB_PORT=
+
+# API
 DATABASE_URL=
-PORT=
 JWT_SECRET=
+NODE_ENV=
+API_PORT=
+
+# Web
+WEB_PORT=
+
+# Development URLs
+API_URL=
 WEB_URL=
-HUGGINGFACE_API_KEY=
 ```
 
-- `podman-compose -f infra/docker-compose.yml up` (or use Docker if preferred)
+- `podman-compose -f infra/docker-compose.yml up` (or use Docker if preferred. Because we use ollama for enhancing feedback, a minimum of 5.4 GB of memory is needed for the virtual machine)
 - Access Adminer at [http://localhost:8080](http://localhost:8080) (used for development purposes)
 
 ## Tech stack - Why did I choose what I chose?
@@ -60,14 +69,6 @@ HUGGINGFACE_API_KEY=
 - JSONB fields for flexible emergency contacts and salary data structure
 - Added admin user that will be able to add employees into the database
 
-**If we had more time**
-
-- Add org chart visualization using the hierarchical data
-- Implement cascading permissions (managers inherit from higher-level managers)
-- Add department-level RBAC rules beyond just manager hierarchy
-
----
-
 ### 14-10 – API & Infra Container Improvements
 
 **Architecture notes**
@@ -75,12 +76,6 @@ HUGGINGFACE_API_KEY=
 - Added healthcheck to API service and ensured it waits for database readiness using `depends_on` with `condition: service_healthy`
 - Added healthcheck endpoint (`/health`) and DB connection test endpoint (`/api/hello`) to backend for container orchestration and diagnostics
 - Confirmed Adminer is available for database inspection at port 8080
-
-**If we had more time**
-
-- Add frontend container to Compose for full-stack orchestration
-- Automate running migrations/seeds inside containers for easier onboarding
-- Add more granular healthchecks and readiness probes for production stability
 
 ### 14-10 – Login System, Modular Routing, and Injectable DB Service
 
@@ -91,12 +86,6 @@ HUGGINGFACE_API_KEY=
 - Refactored backend to use modular routers: `routes/auth.js` for login, `routes/status.js` for health and hello endpoints
 - All routes are now mounted in `server.js` for better separation and maintainability
 
-**If we had more time**
-
-- Add logout and session validation endpoints
-- Implement RBAC middleware for protected routes
-- Add integration and unit tests for authentication and error handling
-
 ### 14-10 – Employee Creation Endpoint & Structured Error Logging
 
 **Architecture notes**
@@ -104,12 +93,6 @@ HUGGINGFACE_API_KEY=
 - Added `POST /api/employees` endpoint for managers to create new employee accounts (with hashed password, manager_id set automatically)
 - Input validation with Zod, authentication and RBAC enforced via JWT
 - Errors are now logged to `logs/error.log` in structured JSON format, ready for Grafana/Loki or other log aggregators
-
-**If we had more time**
-
-- Add audit logging for all sensitive actions
-- Add log rotation and retention policies
-- Extend employee creation to support bulk import and email notifications
 
 ### 14-10 – Profile Creation & Editing Endpoints
 
@@ -119,12 +102,6 @@ HUGGINGFACE_API_KEY=
 - Added `PUT /api/profiles/:userId` endpoint for employees and their managers to edit a profile
 - RBAC logic ensures only the employee or their manager can create/edit, and only managers can set `salary_sensitive` fields
 - Input validation with Zod, authentication via JWT, and error logging integrated
-
-**If we had more time**
-
-- Add audit trail for profile changes
-- Add field-level permissions for more granular control
-- Add profile history/versioning for rollback and review
 
 ### 17-10 – Absence Management, RBAC, and Demo Data
 
@@ -137,12 +114,6 @@ HUGGINGFACE_API_KEY=
 - All error cases now logged using Winston logger for easier debugging
 - Seeded demo absences in migration: employee 3 (pending, denied), employee 1 (approved)
 
-**If we had more time**
-
-- Add absence notifications and approval workflow UI
-- Add absence history and audit trail
-- Add bulk absence import and reporting features
-
 ### 17-10 – Frontend Skeleton Application
 
 **Architecture notes**
@@ -154,8 +125,36 @@ HUGGINGFACE_API_KEY=
 - Added `Navbar` with company name and consistent styling
 - Set up basic auth check in `lib/auth.js` for route protection
 
-**If we had more time**
+## If I had more time
 
-- Add user context and real authentication state management
-- Build out UI and API integration for each page/component
-- Add responsive/mobile styles and accessibility improvements
+1. **Type Safety & Contracts**
+
+   - JavaScript may be a good language for MVPs, but in production I would probably migrate towards at least TypeScript for type safety or Go/Java
+
+2. **Automated Testing**
+
+   - I did not have time to add tests for this project. Now that the MVP is functional, I would add integration tests to test out flows (manager approve/reject a leave, employee giving feedback etc) to make sure we have functionality on lockdown
+
+3. **CI/CD Pipeline**
+
+   - Set up a piepline to build the projects (React project still works on dev server, for example. I would like to add CI/CD so that I build the project, get static files, serve them over nginx or something)
+
+4. **API Documentation & Validation**
+
+   - Write down documentation on majority of the code, add a Swagger file for backend api. Documentation is also helpful for AI development frther down the line
+
+5. **Frontend Component Library**
+
+   - Many pieces of code from the frontend can be extracted and reused. My goal fr the MVP was to make it work, so I copy pasted a lot of code instead of modularise it.
+
+6. **RBAC & Security Hardening**
+
+   - The RBAC logic can also be conccentrated in a module or file. Also, I neglected security while doing this MVP. For production release, I need to go through at least the highest/most popular OWASP exploits to double check my app does not have issues
+
+7. **Observability & Monitoring**
+
+   - I started with the idea of a Grafana dashboard in mind, this is why I also created a log class in backend service. I would like to create a dashboard to have every user action traceable. Maybe add reqeust IDs from the frontend to the backend also
+
+8. **UI/UX**
+
+   - I am not a good designer and most of the way the UI looks and feels was made using AI tools and how easy was for me to test the features. A better design would be needed for production release
