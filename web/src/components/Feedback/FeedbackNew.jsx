@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { enhanceFeedbackWithAI } from "../../lib/ai";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { getAllUsers, postFeedback } from "../../lib/api";
 import { useNavigate } from "react-router-dom";
@@ -8,6 +9,7 @@ export default function FeedbackNew() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [body, setBody] = useState("");
   const [error, setError] = useState("");
+  const [aiLoading, setAiLoading] = useState(false);
   const navigate = useNavigate();
 
   const { data } = useQuery({
@@ -71,18 +73,40 @@ export default function FeedbackNew() {
           <textarea
             value={body}
             onChange={(e) => setBody(e.target.value)}
-            disabled={!selectedUser}
+            disabled={!selectedUser || aiLoading}
             placeholder={
               selectedUser ? "Write your feedback..." : "Select a user first"
             }
             className="border rounded px-2 py-1 w-full min-h-[80px]"
             required
           />
+          {selectedUser && body.trim() && (
+            <button
+              type="button"
+              className="mt-2 px-3 py-1 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-60"
+              disabled={aiLoading}
+              onClick={async () => {
+                setAiLoading(true);
+                setError("");
+                try {
+                  const enhanced = await enhanceFeedbackWithAI(body);
+                  setBody(enhanced);
+                } catch (e) {
+                  console.log(e);
+                  setError("AI enhancement failed");
+                } finally {
+                  setAiLoading(false);
+                }
+              }}
+            >
+              {aiLoading ? "Enhancing..." : "Enhance with AI"}
+            </button>
+          )}
         </div>
         {error && <div className="text-red-600">{error}</div>}
         <button
           type="submit"
-          disabled={!selectedUser || mutation.isLoading}
+          disabled={!selectedUser || mutation.isLoading || aiLoading}
           className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
         >
           {mutation.isLoading ? "Submitting..." : "Submit Feedback"}

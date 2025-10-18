@@ -68,5 +68,27 @@ services:
     depends_on:
       - api
 
+  ollama:
+    image: ollama/ollama:latest
+    container_name: hrmvp_ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+      - ../ollama/start-ollama-model.sh:/start-ollama-model.sh:ro
+    entrypoint: ["sh", "/start-ollama-model.sh"]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    deploy:
+      resources:
+        limits:
+          memory: 6g
+
 volumes:
   db_data:
+  ollama_data:
