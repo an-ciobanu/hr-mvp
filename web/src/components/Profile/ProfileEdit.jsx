@@ -1,14 +1,15 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getMyProfile } from "../../lib/api";
+import { getMyProfile, getProfileById } from "../../lib/api";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function ProfileEdit() {
+export default function ProfileEdit({ userId }) {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const isOtherUser = !!userId;
   const { data, isLoading } = useQuery({
-    queryKey: ["me"],
-    queryFn: getMyProfile,
+    queryKey: isOtherUser ? ["profile", userId] : ["me"],
+    queryFn: isOtherUser ? () => getProfileById(userId) : getMyProfile,
     retry: false,
   });
 
@@ -34,7 +35,8 @@ export default function ProfileEdit() {
   const mutation = useMutation({
     mutationFn: async (formData) => {
       const baseUrl = import.meta.env.VITE_API_URL || "";
-      const res = await fetch(`${baseUrl}/api/profiles/${data.user.id}`, {
+      const targetId = isOtherUser ? userId : data.user.id;
+      const res = await fetch(`${baseUrl}/api/profiles/${targetId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -47,7 +49,7 @@ export default function ProfileEdit() {
     onSuccess: () => {
       setSuccess(true);
       setError("");
-      queryClient.invalidateQueries(["me"]);
+      queryClient.invalidateQueries(isOtherUser ? ["profile", userId] : ["me"]);
     },
     onError: (err) => {
       setError(err.message);

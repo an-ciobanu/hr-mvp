@@ -1,40 +1,44 @@
-import { useQuery } from "@tanstack/react-query";
-import { getMyProfile } from "../../lib/api";
 import { useNavigate } from "react-router-dom";
 
-export default function ProfileView() {
-  const { data, isLoading } = useQuery({
-    queryKey: ["me"],
-    queryFn: getMyProfile,
-    retry: false,
-  });
+/**
+ * ProfileView displays a user's profile.
+ * @param {object} props
+ * @param {object} props.profile - Profile data
+ * @param {object} [props.user] - User data (optional)
+ * @param {array} [props.feedback] - Feedback array (optional)
+ */
+export default function ProfileView({ profile, user, feedback }) {
   const navigate = useNavigate();
 
-  if (isLoading) return <div className="card">Loading profile...</div>;
-  if (!data || !data.ok)
-    return <div className="alert">Could not load profile.</div>;
-
-  const { profile, user } = data;
+  if (!profile) return <div className="alert">No profile data.</div>;
 
   return (
     <div className="card" style={{ maxWidth: 500, margin: "2rem auto" }}>
       <h2 style={{ marginBottom: "1rem" }}>{user?.name || "My Profile"}</h2>
-      <button
-        className="btn"
-        style={{ float: "right", marginTop: "-2.5rem" }}
-        onClick={() => navigate("/profile/edit")}
-      >
-        Edit Profile
-      </button>
-      <div style={{ marginBottom: ".5rem" }}>
-        <strong>Email:</strong> {user?.email}
-      </div>
-      <div style={{ marginBottom: ".5rem" }}>
-        <strong>Role:</strong> {user?.role}
-      </div>
-      <div style={{ marginBottom: ".5rem" }}>
-        <strong>Department:</strong> {user?.department}
-      </div>
+      {user && (
+        <button
+          className="btn"
+          style={{ float: "right", marginTop: "-2.5rem" }}
+          onClick={() => navigate("/profile/edit")}
+        >
+          Edit Profile
+        </button>
+      )}
+      {user && (
+        <div style={{ marginBottom: ".5rem" }}>
+          <strong>Email:</strong> {user.email}
+        </div>
+      )}
+      {user && (
+        <div style={{ marginBottom: ".5rem" }}>
+          <strong>Role:</strong> {user.role}
+        </div>
+      )}
+      {user && (
+        <div style={{ marginBottom: ".5rem" }}>
+          <strong>Department:</strong> {user.department}
+        </div>
+      )}
       <hr />
       <div style={{ marginBottom: ".5rem" }}>
         <strong>Phone:</strong> {profile.phone}
@@ -57,6 +61,31 @@ export default function ProfileView() {
         <div style={{ marginBottom: ".5rem" }}>
           <strong>Salary:</strong> {profile.salary_sensitive.amount}{" "}
           {profile.salary_sensitive.currency}
+        </div>
+      )}
+      {!Array.isArray(feedback) && feedback !== null && (
+        <div className="alert" style={{ color: "red" }}>
+          Feedback data is not an array: {JSON.stringify(feedback)}
+        </div>
+      )}
+      {Array.isArray(feedback) && feedback.length > 0 && (
+        <div style={{ marginTop: "2rem" }}>
+          <h3>Feedback Received</h3>
+          <ul className="space-y-2">
+            {feedback.map((fb) => (
+              <li key={fb.id} className="border p-2 rounded">
+                <div>
+                  <strong>From:</strong> {fb.author_user_id}
+                </div>
+                <div>
+                  <strong>Message:</strong> {fb.body_polished || fb.body_raw}
+                </div>
+                <div className="text-xs text-gray-500">
+                  {new Date(fb.created_at).toLocaleString()}
+                </div>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
     </div>

@@ -17,7 +17,6 @@ export default function LoginForm() {
     setLoading(true);
     const res = await login(email, password);
     setLoading(false);
-    console.log("res: ", res);
     if (res.success) {
       queryClient.invalidateQueries(["me"]);
       navigate("/profile");

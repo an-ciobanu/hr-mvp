@@ -1,5 +1,9 @@
-// Simple auth util: checks if user is logged in by looking for a token cookie
-export function isLoggedIn() {
-  // In a real app, check for a valid cookie or user context
-  return document.cookie.includes("token=");
+/**
+ * POST /api/auth/logout
+ * Logs out the current user by removing the session token.
+ * @returns {Promise<{ success: boolean, error?: string }>}
+ */
+export async function logout() {
+  localStorage.removeItem("token");
+  return { success: true };
 }

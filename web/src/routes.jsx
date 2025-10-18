@@ -7,6 +7,8 @@ import FeedbackNewPage from "./pages/FeedbackNewPage";
 import AbsenceListPage from "./pages/AbsenceListPage";
 import AbsenceRequestPage from "./pages/AbsenceRequestPage";
 import ManagerPanelPage from "./pages/ManagerPanelPage";
+import EmployeeListPage from "./pages/EmployeeListPage";
+import EmployeeProfileEditPage from "./pages/EmployeeProfileEditPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import ProtectedRoute from "./components/Common/ProtectedRoute";
 import { useAuth } from "./components/Auth/AuthContext";
@@ -56,6 +58,30 @@ export default function AppRoutes() {
         element={
           <ProtectedRoute>
             <FeedbackListPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/employees"
+        element={
+          <ProtectedRoute>
+            <EmployeeListPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/employees/:userId"
+        element={
+          <ProtectedRoute>
+            <ProfileViewPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/employees/:userId/edit"
+        element={
+          <ProtectedRoute>
+            <EmployeeProfileEditPage />
           </ProtectedRoute>
         }
       />

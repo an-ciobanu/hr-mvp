@@ -62,4 +62,21 @@ router.post("/", async (c) => {
   }
 });
 
+router.get("/", async (c) => {
+  const cookie = c.req.header("Cookie") || "";
+  const user = getUserFromCookie(cookie);
+  if (!user) {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
+  try {
+    const users = await sql`
+      SELECT id, name, email, role, department FROM users ORDER BY name ASC
+    `;
+    return c.json({ users });
+  } catch (err) {
+    logger.error("DB error fetching users", err);
+    return c.json({ error: "Failed to fetch users" }, 500);
+  }
+});
+
 export default router;

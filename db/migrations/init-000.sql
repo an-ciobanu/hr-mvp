@@ -124,7 +124,18 @@ VALUES
 		'Executive',
 		NULL,
 		crypt('AdminHRMVP!2025', gen_salt('bf'))
-	),
+	);
+
+INSERT INTO
+	users (
+		name,
+		email,
+		role,
+		department,
+		manager_id,
+		password_hash
+	)
+VALUES
 	-- Manager 1 (reports to admin)
 	(
 		'Manager One',
@@ -156,8 +167,19 @@ VALUES
 				email = 'admin@hrmvp.com'
 		),
 		crypt('Manager2!2025', gen_salt('bf'))
-	),
-	-- Employee 1 (reports to Manager 1)
+	);
+
+INSERT INTO
+	users (
+		name,
+		email,
+		role,
+		department,
+		manager_id,
+		password_hash
+	)
+VALUES
+	-- Employee 1 (reports to Manager 2)
 	(
 		'Employee One',
 		'employee1@hrmvp.com',
@@ -169,11 +191,11 @@ VALUES
 			FROM
 				users
 			WHERE
-				email = 'manager1@hrmvp.com'
+				email = 'manager2@hrmvp.com'
 		),
 		crypt('Employee1!2025', gen_salt('bf'))
 	),
-	-- Employee 2 (reports to Manager 2)
+	-- Employee 2 (reports to Manager 1)
 	(
 		'Employee Two',
 		'employee2@hrmvp.com',
@@ -185,11 +207,11 @@ VALUES
 			FROM
 				users
 			WHERE
-				email = 'manager2@hrmvp.com'
+				email = 'manager1@hrmvp.com'
 		),
 		crypt('Employee2!2025', gen_salt('bf'))
 	),
-	-- Employee 3 (reports to Manager 2)
+	-- Employee 3 (reports to Manager 1)
 	(
 		'Employee Three',
 		'employee3@hrmvp.com',
@@ -201,7 +223,7 @@ VALUES
 			FROM
 				users
 			WHERE
-				email = 'manager2@hrmvp.com'
+				email = 'manager1@hrmvp.com'
 		),
 		crypt('Employee3!2025', gen_salt('bf'))
 	);

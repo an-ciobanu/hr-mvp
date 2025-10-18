@@ -169,15 +169,18 @@ router.get("/:userId", async (c) => {
     return c.json({ error: "Unauthorized" }, 401);
   }
   try {
-    const profile = await sql`SELECT * FROM profiles WHERE user_id = ${userId}`;
-    if (!profile.length) {
+    const profileRows =
+      await sql`SELECT * FROM profiles WHERE user_id = ${userId}`;
+    if (!profileRows.length) {
       return c.json({ error: "Profile not found" }, 404);
     }
+    const userRows =
+      await sql`SELECT manager_id FROM users WHERE id = ${userId}`;
+    const manager_id = userRows[0]?.manager_id || null;
 
-    let filtered = profile[0];
+    let filtered = { ...profileRows[0], manager_id };
     if (user.id !== userId) {
-      const res = await sql`SELECT manager_id FROM users WHERE id = ${userId}`;
-      const isManager = res[0] && res[0].manager_id === user.id;
+      const isManager = manager_id === user.id;
       if (!isManager) {
         const { phone, address, emergency_contact, salary_sensitive, ...rest } =
           filtered;

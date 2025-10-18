@@ -1,3 +1,5 @@
+import { sql } from "./db.js";
+
 // RBAC helper: returns true if user is self or manager of target
 /**
  * Middleware to ensure user has required role

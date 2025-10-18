@@ -11,6 +11,33 @@ const feedbackSchema = z.object({
 });
 
 /**
+ * GET /api/feedback/:userId
+ * Returns all feedback for a given user (target_user_id)
+ */
+router.get("/:userId", async (c) => {
+  const userId = c.req.param("userId");
+  const cookie = c.req.header("Cookie") || "";
+  const user = getUserFromCookie(cookie);
+  if (!user) {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
+  // Check if user is the target or their manager
+  const { isEmployeeOrManager } = await import("../lib/utils.js");
+  if (!(await isEmployeeOrManager(user, userId))) {
+    return c.json({ error: "Forbidden" }, 403);
+  }
+  try {
+    const feedback = await sql`
+        SELECT * FROM feedback WHERE target_user_id = ${userId} ORDER BY created_at DESC
+      `;
+    return c.json({ feedback });
+  } catch (err) {
+    logger.error("DB error fetching feedback", err);
+    return c.json({ error: "Failed to fetch feedback" }, 500);
+  }
+});
+
+/**
  * POST /api/feedback
  * Coworker/manager leaves feedback for an employee
  */
@@ -39,7 +66,7 @@ router.post("/:userId", async (c) => {
       VALUES (
         ${userId},
         ${user.id},
-        ${body.body_raw}
+        ${body.body_raw},
         NOW()
       )
       RETURNING *
