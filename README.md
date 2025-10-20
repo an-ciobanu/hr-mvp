@@ -129,7 +129,7 @@ WEB_URL=
 
 1. **Type Safety & Contracts**
 
-   - JavaScript may be a good language for MVPs, but in production I would probably migrate towards at least TypeScript for type safety or Go/Java
+   - JavaScript may be a good language for MVPs, but in production I would probably migrate towards at least TypeScript for type safety or Go/Java. Also Go is more resource efficient than Node/Bun.
 
 2. **Automated Testing**
 
@@ -150,11 +150,16 @@ WEB_URL=
 6. **RBAC & Security Hardening**
 
    - The RBAC logic can also be conccentrated in a module or file. Also, I neglected security while doing this MVP. For production release, I need to go through at least the highest/most popular OWASP exploits to double check my app does not have issues
+  
+7. **Refactor business/service/dara layers**
 
-7. **Observability & Monitoring**
+   - Currently the code is simmple and straight to the point. But if more features are needed, the backend needs to separate better business/service/data layers.
+
+8. **Observability & Monitoring**
 
    - I started with the idea of a Grafana dashboard in mind, this is why I also created a log class in backend service. I would like to create a dashboard to have every user action traceable. Maybe add reqeust IDs from the frontend to the backend also
 
-8. **UI/UX**
+9. **UI/UX**
 
    - I am not a good designer and most of the way the UI looks and feels was made using AI tools and how easy was for me to test the features. A better design would be needed for production release
+
