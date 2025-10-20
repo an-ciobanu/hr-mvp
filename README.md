@@ -1,7 +1,7 @@
 ## Run the project
 
 **Environment variables:**  
-Set these in your `.env` (at repo root):
+Set these in your `.env` (in infra/ folder, you also shave an example there):
 
 ```
 # Database
